@@ -46,7 +46,7 @@ for SA_EMAIL in $USER_CREATED_SAS; do
   for ROLE in "${ADMIN_ROLES[@]}"; do
     MATCH=$(echo "$IAM_POLICY" | jq -r --arg ROLE "$ROLE" --arg MEMBER "serviceAccount:$SA_EMAIL" '
       .bindings[]? | select(.role == $ROLE) | .members[]? | select(. == $MEMBER)')
-    
+
     if [[ -n "$MATCH" ]]; then
       echo "Non-compliant: $MATCH has admin role $ROLE"
       NON_COMPLIANT=1

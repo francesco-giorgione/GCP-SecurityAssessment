@@ -15,4 +15,3 @@ echo "ORG policies saved in org_policies.json"
 echo "Collecting access policies..."
 ./collect-ACCPOL.sh
 echo "Access policies saved in access_policies.json"
-
