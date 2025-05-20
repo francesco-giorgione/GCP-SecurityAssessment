@@ -39,13 +39,12 @@ for DEST in $BUCKET_URLS; do
     echo "Retention policy:"
     echo "$RETENTION_OUTPUT"
 
-    IS_LOCKED=$(echo "$RETENTION_OUTPUT" | grep "isLocked" | awk '{print $2}')
-    if [ "$IS_LOCKED" == "true" ]; then
-      echo "Bucket is locked."
-    elif [ "$IS_LOCKED" == "false" ]; then
-      echo "Bucket is not locked."
+    HAS_RETENTION=$(echo "$RETENTION_OUTPUT" | grep "retentionPeriod")
+
+    if echo "$RETENTION_OUTPUT" | grep -q "Duration"; then
+      echo "Retention policy is set."
     else
-      echo "Bucket lock status not found (might be not locked)."
+      echo "Warning: no retention policy is set. Manual review recommended!"
     fi
   fi
 done
