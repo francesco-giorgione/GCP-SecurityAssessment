@@ -39,8 +39,11 @@ esac
 echo "Allowed domain: $AUTHORIZED_DOMAIN"
 echo "----------------------------------------------------"
 
+NON_COMPLIANT_FOUND=0  # Flag to track non-compliance
+
 # Extract and analyze IAM members
-echo "$IAM_JSON" | jq -r '.bindings[].members[]' | sort | uniq | while read -r MEMBER; do
+MEMBERS=$(echo "$IAM_JSON" | jq -r '.bindings[].members[]' | sort | uniq)
+while read -r MEMBER; do
   TYPE=$(echo "$MEMBER" | cut -d':' -f1)
   IDENTIFIER=$(echo "$MEMBER" | cut -d':' -f2-)
 
@@ -48,15 +51,24 @@ echo "$IAM_JSON" | jq -r '.bindings[].members[]' | sort | uniq | while read -r M
     user)
       if [[ "$IDENTIFIER" != *"@$AUTHORIZED_DOMAIN" ]]; then
         echo "NON-COMPLIANT: External user detected: $IDENTIFIER"
+        NON_COMPLIANT_FOUND=1
       fi
       ;;
     serviceAccount)
       if [[ "$IDENTIFIER" != *"@$AUTHORIZED_DOMAIN" && "$IDENTIFIER" != *".gserviceaccount.com" ]]; then
         echo "NON-COMPLIANT: External service account detected: $IDENTIFIER"
+        NON_COMPLIANT_FOUND=1
       fi
       ;;
     *)
       :
       ;;
   esac
-done
+done <<< "$MEMBERS"
+
+# Exit with code 2 if any non-compliant member found
+if [[ $NON_COMPLIANT_FOUND -eq 1 ]]; then
+  exit 2
+fi
+
+exit 0

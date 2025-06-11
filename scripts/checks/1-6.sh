@@ -39,6 +39,7 @@ fi
 
 if [[ "$NON_COMPLIANT" -eq 0 ]]; then
   echo "No risky service account roles found at project level. Project is compliant."
+  exit 0
 else
   echo "One or more risky IAM roles are assigned at project level. Manual review recommended."
   exit 2

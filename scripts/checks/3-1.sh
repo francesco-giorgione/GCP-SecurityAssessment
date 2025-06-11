@@ -18,7 +18,8 @@ NETWORKS=$(gcloud compute networks list --format="value(name)")
 # Check if 'default' network exists
 if echo "$NETWORKS" | grep -q "^default$"; then
   echo "NON-COMPLIANT: 'default' network exists in project '$PROJECT_ID'."
-  exit 1
+  exit 2
 else
   echo "No default network found in project '$PROJECT_ID'."
+  exit 0
 fi

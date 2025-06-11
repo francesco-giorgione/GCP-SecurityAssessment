@@ -7,6 +7,7 @@ if [ -z "$1" ]; then
 fi
 
 PROJECT_ID="$1"
+NON_COMPLIANT_FOUND=0  # Flag to track non-compliance
 
 echo "Listing sinks in project '$PROJECT_ID' that export to Cloud Storage..."
 
@@ -39,12 +40,18 @@ for DEST in $BUCKET_URLS; do
     echo "Retention policy:"
     echo "$RETENTION_OUTPUT"
 
-    HAS_RETENTION=$(echo "$RETENTION_OUTPUT" | grep "retentionPeriod")
-
     if echo "$RETENTION_OUTPUT" | grep -q "Duration"; then
       echo "Retention policy is set."
     else
       echo "NON-COMPLIANT: no retention policy is set. Manual review recommended!"
+      NON_COMPLIANT_FOUND=1
     fi
   fi
 done
+
+# Exit with code 2 if any non-compliant bucket found
+if [ $NON_COMPLIANT_FOUND -eq 1 ]; then
+  exit 2
+fi
+
+exit 0

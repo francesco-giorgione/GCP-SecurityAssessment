@@ -46,7 +46,7 @@ LOGFILE="logs/check-all_${PROJECT_ID}_${TIMESTAMP}.log"
   echo
 } > "$LOGFILE"
 
-# Execute each script and log the output
+# Execute each script and log the output and exit code
 for SCRIPT in "${SCRIPTS[@]}"; do
   echo "Running: $SCRIPT for project $PROJECT_ID..."
 
@@ -63,8 +63,14 @@ for SCRIPT in "${SCRIPTS[@]}"; do
       else
         ./"$SCRIPT" "$PROJECT_ID"
       fi
+      EXIT_CODE=$?
+      echo
+      echo "Script $SCRIPT exited with code: $EXIT_CODE"
+      echo
     else
       echo "Warning: Script $SCRIPT not found or not executable."
+      EXIT_CODE=127
+      echo "Script $SCRIPT exited with code: $EXIT_CODE"
     fi
 
     echo
@@ -73,6 +79,8 @@ for SCRIPT in "${SCRIPTS[@]}"; do
     echo "--------------------------------------------------------------------------------"
     echo
   } >> "$LOGFILE" 2>&1
+
+  echo "Script $SCRIPT exited with code: $EXIT_CODE"
 done
 
 # Final log message

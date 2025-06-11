@@ -15,7 +15,7 @@ POLICY_JSON=$(gcloud projects get-iam-policy "$PROJECT_ID" --format=json)
 AUDIT_CONFIGS=$(echo "$POLICY_JSON" | jq '.auditConfigs // empty')
 
 if [[ -z "$AUDIT_CONFIGS" ]]; then
-  echo "Missing auditConfigs section in IAM policy."
+  echo "NON-COMPLIANT: Missing auditConfigs section in IAM policy."
   exit 2
 fi
 
@@ -23,8 +23,8 @@ fi
 ALL_SERVICES_CONFIG=$(echo "$AUDIT_CONFIGS" | jq '.[] | select(.service == "allServices")')
 
 if [[ -z "$ALL_SERVICES_CONFIG" ]]; then
-  echo "No auditConfigs entry for 'allServices'."
-  exit 3
+  echo "NON-COMPLIANT: No auditConfigs entry for 'allServices'."
+  exit 2
 fi
 
 # Required log types
@@ -34,8 +34,8 @@ REQUIRED_LOGTYPES=("ADMIN_READ" "DATA_WRITE" "DATA_READ")
 for LOGTYPE in "${REQUIRED_LOGTYPES[@]}"; do
   MATCH=$(echo "$ALL_SERVICES_CONFIG" | jq -e --arg LOGTYPE "$LOGTYPE" '.auditLogConfigs[]? | select(.logType == $LOGTYPE)')
   if [[ -z "$MATCH" ]]; then
-    echo "Missing logType: $LOGTYPE in allServices audit config."
-    exit 4
+    echo "NON-COMPLIANT: Missing logType: $LOGTYPE in allServices audit config."
+    exit 2
   fi
 done
 
@@ -45,7 +45,8 @@ EXEMPTED=$(echo "$ALL_SERVICES_CONFIG" | jq '.auditLogConfigs[]?.exemptedMembers
 if [[ -n "$EXEMPTED" ]]; then
   echo "NON-COMPLIANT: Found exemptedMembers in audit config"
   echo "$EXEMPTED"
-  exit 5
+  exit 2
 fi
 
 echo "Audit logging configuration is fully compliant with CIS benchmark."
+exit 0

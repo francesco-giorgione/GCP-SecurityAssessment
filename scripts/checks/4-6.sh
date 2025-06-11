@@ -22,8 +22,9 @@ if [ -n "$FORWARDING_INSTANCES" ]; then
   echo ""
   echo "NON-COMPLIANT: The following instances have IP forwarding enabled:"
   echo "$FORWARDING_INSTANCES"
-  exit 1
+  exit 2
 else
   echo ""
   echo "All instances have IP forwarding disabled."
+  exit 0
 fi

@@ -38,6 +38,7 @@ done
 
 if [[ "$NON_COMPLIANT" -eq 0 ]]; then
   echo "All user-created service accounts are compliant. No high-privilege roles found."
+  exit 0
 else
   echo "One or more user-created service accounts have high-privilege roles. Manual review recommended."
   exit 2

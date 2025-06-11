@@ -38,7 +38,8 @@ VM_WITH_PUBLIC_IPS=$(echo "$JSON_OUTPUT" | jq -r '
 if [ -n "$VM_WITH_PUBLIC_IPS" ]; then
   echo "NON-COMPLIANT: The following non-GKE instances are set to have public IP addresses:"
   echo "$VM_WITH_PUBLIC_IPS"
-  exit 1
+  exit 2
 else
   echo "No public IPs found on non-GKE instances in project '$PROJECT_ID'."
+  exit 0
 fi

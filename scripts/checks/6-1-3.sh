@@ -7,6 +7,7 @@ if [ "$#" -ne 1 ]; then
 fi
 
 PROJECT_ID="$1"
+NON_COMPLIANT_FOUND=0  # Flag per tenere traccia di non-compliance
 
 # Set the active project
 gcloud config set project "$PROJECT_ID" >/dev/null
@@ -46,7 +47,14 @@ for INSTANCE in $INSTANCES; do
     echo "Flag local_infile is explicitly set to OFF."
   elif [ "$FLAG_VALUE" == "on" ]; then
     echo "NON-COMPLIANT: Flag local_infile is ON — this is a security risk!"
+    NON_COMPLIANT_FOUND=1
   else
     echo "NON-COMPLIANT: Flag local_infile has unexpected value: $FLAG_VALUE"
+    NON_COMPLIANT_FOUND=1
   fi
 done
+
+# Exit with code 2 if any non-compliant instance found
+if [ $NON_COMPLIANT_FOUND -eq 1 ]; then
+  exit 2
+fi
