@@ -45,8 +45,8 @@ for INSTANCE in $INSTANCES; do
   elif [ "$FLAG_VALUE" == "off" ]; then
     echo "Flag local_infile is explicitly set to OFF."
   elif [ "$FLAG_VALUE" == "on" ]; then
-    echo "Flag local_infile is ON — this is a security risk!"
+    echo "NON-COMPLIANT: Flag local_infile is ON — this is a security risk!"
   else
-    echo "Flag local_infile has unexpected value: $FLAG_VALUE"
+    echo "NON-COMPLIANT: Flag local_infile has unexpected value: $FLAG_VALUE"
   fi
 done

@@ -47,19 +47,16 @@ echo "$IAM_JSON" | jq -r '.bindings[].members[]' | sort | uniq | while read -r M
   case "$TYPE" in
     user)
       if [[ "$IDENTIFIER" != *"@$AUTHORIZED_DOMAIN" ]]; then
-        echo "External user detected: $IDENTIFIER"
+        echo "NON-COMPLIANT: External user detected: $IDENTIFIER"
       fi
       ;;
     serviceAccount)
       if [[ "$IDENTIFIER" != *"@$AUTHORIZED_DOMAIN" && "$IDENTIFIER" != *".gserviceaccount.com" ]]; then
-        echo "External service account detected: $IDENTIFIER"
+        echo "NON-COMPLIANT: External service account detected: $IDENTIFIER"
       fi
       ;;
     *)
-      # Other types (e.g., group, domain, etc.) can be handled if needed
       :
       ;;
   esac
 done
-
-echo "✅ Scan completed."

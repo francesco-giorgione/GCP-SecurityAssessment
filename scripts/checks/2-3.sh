@@ -44,7 +44,7 @@ for DEST in $BUCKET_URLS; do
     if echo "$RETENTION_OUTPUT" | grep -q "Duration"; then
       echo "Retention policy is set."
     else
-      echo "Warning: no retention policy is set. Manual review recommended!"
+      echo "NON-COMPLIANT: no retention policy is set. Manual review recommended!"
     fi
   fi
 done

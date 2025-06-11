@@ -43,7 +43,7 @@ done
 EXEMPTED=$(echo "$ALL_SERVICES_CONFIG" | jq '.auditLogConfigs[]?.exemptedMembers? // empty')
 
 if [[ -n "$EXEMPTED" ]]; then
-  echo "Found exemptedMembers in audit config, which is not allowed:"
+  echo "NON-COMPLIANT: Found exemptedMembers in audit config"
   echo "$EXEMPTED"
   exit 5
 fi

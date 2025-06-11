@@ -30,7 +30,7 @@ for SA_EMAIL in $USER_CREATED_SAS; do
     .bindings[]? | select(.members[]? == $MEMBER) | .role' | grep -Ei 'admin|roles/editor|roles/owner')
 
   if [[ -n "$MATCHES" ]]; then
-    echo "Non-compliant: $SA_EMAIL has high-privilege roles:"
+    echo "NON-COMPLIANT: $SA_EMAIL has high-privilege roles:"
     echo "$MATCHES" | sed 's/^/  - /'
     NON_COMPLIANT=1
   fi

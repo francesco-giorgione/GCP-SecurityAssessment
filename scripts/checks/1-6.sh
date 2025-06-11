@@ -19,7 +19,7 @@ NON_COMPLIANT=0
 SA_USER_BINDING=$(echo "$IAM_POLICY" | jq -r '.bindings[] | select(.role=="roles/iam.serviceAccountUser")')
 
 if [[ -n "$SA_USER_BINDING" ]]; then
-  echo "Problem detected: The role 'roles/iam.serviceAccountUser' is assigned at the project level."
+  echo "NON-COMPLIANT: The role 'roles/iam.serviceAccountUser' is assigned at the project level."
   echo "This gives users the ability to act as any service account in the project, violating the principle of least privilege."
   echo "Role binding:"
   echo "$SA_USER_BINDING" | jq
@@ -30,7 +30,7 @@ fi
 SA_TOKEN_CREATOR_BINDING=$(echo "$IAM_POLICY" | jq -r '.bindings[] | select(.role=="roles/iam.serviceAccountTokenCreator")')
 
 if [[ -n "$SA_TOKEN_CREATOR_BINDING" ]]; then
-  echo "Problem detected: The role 'roles/iam.serviceAccountTokenCreator' is assigned at the project level."
+  echo "NON-COMPLIANT: The role 'roles/iam.serviceAccountTokenCreator' is assigned at the project level."
   echo "This allows users to impersonate any service account in the project, potentially escalating privileges."
   echo "Role binding:"
   echo "$SA_TOKEN_CREATOR_BINDING" | jq
@@ -40,6 +40,6 @@ fi
 if [[ "$NON_COMPLIANT" -eq 0 ]]; then
   echo "No risky service account roles found at project level. Project is compliant."
 else
-  echo "One or more risky IAM roles are assigned at project level. Manual review and remediation are recommended."
+  echo "One or more risky IAM roles are assigned at project level. Manual review recommended."
   exit 2
 fi

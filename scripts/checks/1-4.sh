@@ -30,7 +30,7 @@ for SA in $SA_LIST; do
     --format="value(name)")
 
   if [[ -n "$KEYS" ]]; then
-    echo "Non-compliant: user-managed keys found for $SA"
+    echo "NON-COMPLIANT: user-managed keys found for $SA"
     NON_COMPLIANT_FOUND=1
   else
     echo "Compliant: no user-managed keys found for $SA"

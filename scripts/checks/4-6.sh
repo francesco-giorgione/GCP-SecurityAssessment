@@ -20,7 +20,7 @@ FORWARDING_INSTANCES=$(echo "$OUTPUT" | grep -i -w "true")
 
 if [ -n "$FORWARDING_INSTANCES" ]; then
   echo ""
-  echo "Warning: The following instances have IP forwarding enabled:"
+  echo "NON-COMPLIANT: The following instances have IP forwarding enabled:"
   echo "$FORWARDING_INSTANCES"
   exit 1
 else
