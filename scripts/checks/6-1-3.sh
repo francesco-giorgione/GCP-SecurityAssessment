@@ -30,7 +30,7 @@ for INSTANCE in $INSTANCES; do
   HAS_FLAGS=$(echo "$JSON_OUTPUT" | jq '.settings.databaseFlags != null')
 
   if [ "$HAS_FLAGS" != "true" ]; then
-    echo "✅ Flag local_infile is not set (default OFF)."
+    echo "Flag local_infile is not set (default OFF)."
     continue
   fi
 
@@ -41,12 +41,12 @@ for INSTANCE in $INSTANCES; do
     | .value')
 
   if [ -z "$FLAG_VALUE" ]; then
-    echo "✅ Flag local_infile is not set (default OFF)."
+    echo "Flag local_infile is not set (default OFF)."
   elif [ "$FLAG_VALUE" == "off" ]; then
-    echo "✅ Flag local_infile is explicitly set to OFF."
+    echo "Flag local_infile is explicitly set to OFF."
   elif [ "$FLAG_VALUE" == "on" ]; then
-    echo "❌ Flag local_infile is ON — this is a security risk!"
+    echo "Flag local_infile is ON — this is a security risk!"
   else
-    echo "⚠️ Flag local_infile has unexpected value: $FLAG_VALUE"
+    echo "Flag local_infile has unexpected value: $FLAG_VALUE"
   fi
 done

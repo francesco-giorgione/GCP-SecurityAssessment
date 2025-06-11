@@ -47,12 +47,12 @@ echo "$IAM_JSON" | jq -r '.bindings[].members[]' | sort | uniq | while read -r M
   case "$TYPE" in
     user)
       if [[ "$IDENTIFIER" != *"@$AUTHORIZED_DOMAIN" ]]; then
-        echo "❌ External user detected: $IDENTIFIER"
+        echo "External user detected: $IDENTIFIER"
       fi
       ;;
     serviceAccount)
       if [[ "$IDENTIFIER" != *"@$AUTHORIZED_DOMAIN" && "$IDENTIFIER" != *".gserviceaccount.com" ]]; then
-        echo "❌ External service account detected: $IDENTIFIER"
+        echo "External service account detected: $IDENTIFIER"
       fi
       ;;
     *)

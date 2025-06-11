@@ -36,9 +36,9 @@ VM_WITH_PUBLIC_IPS=$(echo "$JSON_OUTPUT" | jq -r '
 
 # Output results
 if [ -n "$VM_WITH_PUBLIC_IPS" ]; then
-  echo "❌ The following non-GKE instances are set to have public IP addresses:"
+  echo "The following non-GKE instances are set to have public IP addresses:"
   echo "$VM_WITH_PUBLIC_IPS"
   exit 1
 else
-  echo "✅ No public IPs found on non-GKE instances in project '$PROJECT_ID'."
+  echo "No public IPs found on non-GKE instances in project '$PROJECT_ID'."
 fi
