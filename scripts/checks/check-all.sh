@@ -6,7 +6,7 @@ AUTHORIZED_DOMAIN="$2"
 
 if [ -z "$PROJECT_ID" ]; then
   echo "Error: You must specify a project ID as the first argument."
-  echo "Usage: ./check-all.sh <PROJECT_ID> [AUTHORIZED_DOMAIN]"
+  echo "Usage: ./check-all.sh <PROJECT_ID> <AUTHORIZED_DOMAIN>"
   exit 1
 fi
 
@@ -28,8 +28,14 @@ if $NEEDS_AUTH_DOMAIN && [ -z "$AUTHORIZED_DOMAIN" ]; then
   exit 1
 fi
 
+
+
+
+
 # Create logs directory if it doesn't exist
 mkdir -p logs
+# Create the insights directory if it doesn't exist
+mkdir -p insights
 
 # Generate a timestamped log file
 TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
@@ -45,6 +51,33 @@ LOGFILE="logs/check-all_${PROJECT_ID}_${TIMESTAMP}.log"
   echo "Start time: $(date)"
   echo
 } > "$LOGFILE"
+
+
+# Full path of the output HTML report
+REPORT_FILE="insights/report_${PROJECT_ID}_${TIMESTAMP}.html"
+
+# Start of the HTML file
+echo "<!DOCTYPE html>
+<html>
+<head>
+  <title>Script Execution Report</title>
+  <style>
+    body { font-family: Arial, sans-serif; }
+    table { border-collapse: collapse; width: 60%; margin: 20px auto; }
+    th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
+    th { background-color: #f2f2f2; }
+    .status-0 { background-color: #c8e6c9; }   /* light green */
+    .status-1 { background-color: #fff9c4; }   /* light yellow */
+    .status-2 { background-color: #ffcdd2; }   /* light red */
+  </style>
+</head>
+<body>
+<h2 style=\"text-align:center\">Script Execution Report</h2>
+<table>
+  <tr><th>Script</th><th>Status</th></tr>" > "$REPORT_FILE"
+
+
+
 
 # Execute each script and log the output and exit code
 for SCRIPT in "${SCRIPTS[@]}"; do
@@ -80,8 +113,16 @@ for SCRIPT in "${SCRIPTS[@]}"; do
     echo
   } >> "$LOGFILE" 2>&1
 
+  case $EXIT_CODE in
+    0) status_text="OK! All settings are compliant!" ;;
+    1) status_text="Execution failed. Try again!" ;;
+    2) status_text="Warning: elements of non-compliance detected!" ;;
+  esac
+  echo "<tr class=\"status-$EXIT_CODE\"><td>$SCRIPT</td><td>$status_text</td></tr>" >> "$REPORT_FILE"
+
   echo "Script $SCRIPT exited with code: $EXIT_CODE"
 done
+
 
 # Final log message
 {
@@ -89,4 +130,8 @@ done
   echo "End time: $(date)"
 } >> "$LOGFILE"
 
+# End of the HTML file
+echo "</table></body></html>" >> "$REPORT_FILE"
+
 echo "All output has been saved to: $LOGFILE"
+echo "Report generated: $REPORT_FILE"

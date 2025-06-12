@@ -9,3 +9,4 @@
 *.json
 **/collected/
 /scripts/checks/logs/
+/scripts/checks/insights/
