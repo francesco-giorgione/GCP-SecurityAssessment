@@ -64,6 +64,14 @@ echo "<!DOCTYPE html>
     .status-1 { background-color: #fff9c4; }
     .status-2 { background-color: #ffcdd2; }
     .status-3 { background-color: #fff9c4; }
+    canvas {
+      max-width: 350px !important;
+      max-height: 150px !important;
+      width: 350px !important;
+      height: 150px !important;
+      display: block;
+      margin: 0 auto;
+    }
   </style>
 </head>
 <body>
@@ -73,9 +81,6 @@ echo "<!DOCTYPE html>
 
 # Run scripts
 for SCRIPT in "${SCRIPTS[@]}"; do
-  CATEGORY="${SCRIPT%%-*}"  # extract 'x' from 'x-<other>.sh'
-  ((TOTAL_SCRIPTS[$CATEGORY]++))
-
   echo "Running: $SCRIPT for project $PROJECT_ID..."
 
   {
@@ -101,6 +106,12 @@ for SCRIPT in "${SCRIPTS[@]}"; do
       echo "Script $SCRIPT exited with code: $EXIT_CODE"
     fi
 
+
+    if [[ "$EXIT_CODE" == 0 || "$EXIT_CODE" == 2 ]]; then
+      CATEGORY="${SCRIPT%%-*}"  # extract 'x' from 'x-<other>.sh'
+      ((TOTAL_SCRIPTS[$CATEGORY]++))
+    fi
+
     echo
     echo "--------------------------------------------------------------------------------"
     echo "End of script: $SCRIPT"
@@ -109,7 +120,7 @@ for SCRIPT in "${SCRIPTS[@]}"; do
   } >> "$LOGFILE" 2>&1
 
   # Count failed scripts (exit code != 0)
-  if [[ $EXIT_CODE -ne 0 ]]; then
+  if [[ $EXIT_CODE -eq 2 ]]; then
     ((FAILED_SCRIPTS[$CATEGORY]++))
   fi
 
@@ -130,47 +141,41 @@ done
 echo "</table>" >> "$REPORT_FILE"
 
 # Add summary per category
-echo "</table>" >> "$REPORT_FILE"
-
-CHART_JS=""
-CHART_DATA_INIT=""
-
 echo "<h2 style=\"text-align:center\">Category Summary</h2>
 <table>
   <tr><th>Category</th><th>Total Checks</th><th>Non-Compliant</th><th>Non-Compliance Rate (%)</th><th>Graph</th></tr>" >> "$REPORT_FILE"
+
+CHART_DATA_INIT=""
 
 for CATEGORY in "${!TOTAL_SCRIPTS[@]}"; do
   TOTAL=${TOTAL_SCRIPTS[$CATEGORY]}
   FAILED=${FAILED_SCRIPTS[$CATEGORY]:-0}
   RATE=$(awk "BEGIN {printf \"%.2f\", ($FAILED/$TOTAL)*100}")
+  COMPLIANT=$(($TOTAL - $FAILED))
 
   echo "<tr>
           <td>$CATEGORY</td>
           <td>$TOTAL</td>
           <td>$FAILED</td>
           <td>$RATE%</td>
-          <td><canvas id=\"chart_$CATEGORY\" width=\"300\" height=\"100\"></canvas></td>
+          <td><canvas id=\"chart_$CATEGORY\" width=\"80\" height=\"80\" style=\"max-width:80px; max-height:80px;\"></canvas></td>
         </tr>" >> "$REPORT_FILE"
 
   CHART_DATA_INIT+="
     new Chart(document.getElementById('chart_$CATEGORY'), {
-      type: 'bar',
+      type: 'pie',
       data: {
         labels: ['Compliant', 'Non-Compliant'],
         datasets: [{
           label: 'Checks',
-          data: [$(($TOTAL - $FAILED)), $FAILED],
+          data: [$COMPLIANT, $FAILED],
           backgroundColor: ['#4caf50', '#f44336']
         }]
       },
       options: {
-        indexAxis: 'y',
         plugins: {
-          legend: { display: false },
+          legend: { position: 'right' },
           title: { display: true, text: 'Category $CATEGORY' }
-        },
-        scales: {
-          x: { beginAtZero: true, max: $TOTAL }
         }
       }
     });
