@@ -10,8 +10,11 @@ PROJECT_ID="$1"
 echo "Checking for risky IAM role assignments at project level in project: $PROJECT_ID"
 echo "--------------------------------------------------------------------------"
 
-# Retrieve the full IAM policy for the project
-IAM_POLICY=$(gcloud projects get-iam-policy "$PROJECT_ID" --format=json)
+# Retrieve the full IAM policy for the project with timeout
+IAM_POLICY=$(timeout 20 gcloud projects get-iam-policy "$PROJECT_ID" --format=json) || {
+  echo "ERROR: gcloud command timed out or failed while retrieving IAM policy."
+  exit 3
+}
 
 NON_COMPLIANT=0
 

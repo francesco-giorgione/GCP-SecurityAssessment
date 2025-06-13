@@ -10,8 +10,11 @@ PROJECT_ID="$1"
 echo "Checking user-created service accounts with high-privilege roles in project: $PROJECT_ID"
 echo "----------------------------------------------------------------------------------------"
 
-# List all user-managed service accounts
-ALL_USER_MANAGED_SAS=$(gcloud iam service-accounts list --project="$PROJECT_ID" --format="value(email)")
+# List all user-managed service accounts with timeout
+ALL_USER_MANAGED_SAS=$(timeout 20 gcloud iam service-accounts list --project="$PROJECT_ID" --format="value(email)") || {
+  echo "ERROR: gcloud command timed out or failed while listing service accounts."
+  exit 3
+}
 
 # Filter only user-created accounts (excluding system-managed patterns)
 USER_CREATED_SAS=$(echo "$ALL_USER_MANAGED_SAS" | grep "@$PROJECT_ID.iam.gserviceaccount.com" | grep -Ev '^(compute|appspot|firebase|cloud-functions|cloud-run|gcf|gae|composer|dataproc|gke|cloudbuild|artifactregistry|deploymentmanager)-')
@@ -20,8 +23,11 @@ echo "Identified user-created service accounts:"
 echo "$USER_CREATED_SAS"
 echo "----------------------------------------------------------------------------------------"
 
-# Get IAM policy for the project
-IAM_POLICY=$(gcloud projects get-iam-policy "$PROJECT_ID" --format="json")
+# Get IAM policy for the project with timeout
+IAM_POLICY=$(timeout 20 gcloud projects get-iam-policy "$PROJECT_ID" --format="json") || {
+  echo "ERROR: gcloud command timed out or failed while retrieving IAM policy."
+  exit 3
+}
 
 NON_COMPLIANT=0
 

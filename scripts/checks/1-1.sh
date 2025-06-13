@@ -17,18 +17,28 @@ if [[ -z "$MODE" || -z "$ID" || -z "$AUTHORIZED_DOMAIN" ]]; then
   exit 1
 fi
 
+# Try to retrieve IAM policy with timeout
 case "$MODE" in
   --org)
     echo "Scanning IAM policy for organization ID: $ID"
-    IAM_JSON=$(gcloud organizations get-iam-policy "$ID" --format=json)
+    IAM_JSON=$(timeout 20 gcloud organizations get-iam-policy "$ID" --format=json) || {
+      echo "ERROR: gcloud command timed out or failed while retrieving org IAM policy."
+      exit 3
+    }
     ;;
   --project)
     echo "Scanning IAM policy for project ID: $ID"
-    IAM_JSON=$(gcloud projects get-iam-policy "$ID" --format=json)
+    IAM_JSON=$(timeout 20 gcloud projects get-iam-policy "$ID" --format=json) || {
+      echo "ERROR: gcloud command timed out or failed while retrieving project IAM policy."
+      exit 3
+    }
     ;;
   --folder)
     echo "Scanning IAM policy for folder ID: $ID"
-    IAM_JSON=$(gcloud resource-manager folders get-iam-policy "$ID" --format=json)
+    IAM_JSON=$(timeout 20 gcloud resource-manager folders get-iam-policy "$ID" --format=json) || {
+      echo "ERROR: gcloud command timed out or failed while retrieving folder IAM policy."
+      exit 3
+    }
     ;;
   *)
     echo "ERROR: Invalid mode. Use --org, --project, or --folder."

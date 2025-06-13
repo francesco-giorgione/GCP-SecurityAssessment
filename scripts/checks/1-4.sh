@@ -11,9 +11,12 @@ PROJECT_ID="$1"
 echo "Scanning user-managed service accounts in project: $PROJECT_ID"
 echo "--------------------------------------------------------------"
 
-# Get list of user-managed service accounts
-SA_LIST=$(gcloud iam service-accounts list --project="$PROJECT_ID" \
-  --format="value(email)" | grep "@$PROJECT_ID.iam.gserviceaccount.com")
+# Get list of user-managed service accounts with a 20s timeout
+SA_LIST=$(timeout 20 gcloud iam service-accounts list --project="$PROJECT_ID" \
+  --format="value(email)" | grep "@$PROJECT_ID.iam.gserviceaccount.com") || {
+    echo "ERROR: gcloud command timed out or failed while listing service accounts."
+    exit 3
+}
 
 if [[ -z "$SA_LIST" ]]; then
   echo "No user-managed service accounts found."
@@ -24,10 +27,14 @@ NON_COMPLIANT_FOUND=0
 
 for SA in $SA_LIST; do
   echo "Checking keys for: $SA"
-  KEYS=$(gcloud iam service-accounts keys list \
+
+  KEYS=$(timeout 20 gcloud iam service-accounts keys list \
     --iam-account="$SA" \
     --managed-by=user \
-    --format="value(name)")
+    --format="value(name)") || {
+      echo "ERROR: gcloud command timed out or failed while listing keys for $SA"
+      exit 3
+  }
 
   if [[ -n "$KEYS" ]]; then
     echo "NON-COMPLIANT: user-managed keys found for $SA"

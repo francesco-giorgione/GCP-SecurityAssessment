@@ -11,8 +11,11 @@ NON_COMPLIANT_FOUND=0  # Flag to track non-compliance
 
 echo "Listing sinks in project '$PROJECT_ID' that export to Cloud Storage..."
 
-# Get all sinks for the project that export to storage
-SINKS=$(gcloud logging sinks list --project="$PROJECT_ID" --format="json")
+# Get all sinks for the project that export to storage (with timeout)
+SINKS=$(timeout 20 gcloud logging sinks list --project="$PROJECT_ID" --format="json") || {
+  echo "ERROR: gcloud command timed out after 20 seconds while listing sinks."
+  exit 3
+}
 
 # Extract only storage bucket destinations
 BUCKET_URLS=$(echo "$SINKS" | jq -r '.[] | select(.destination | startswith("storage.googleapis.com/")) | .destination')
@@ -31,8 +34,12 @@ for DEST in $BUCKET_URLS; do
   echo ""
   echo "Checking bucket: gs://$BUCKET_NAME"
 
-  # Get retention info once
-  RETENTION_OUTPUT=$(gsutil retention get gs://$BUCKET_NAME 2>/dev/null)
+  # Get retention info once (with timeout)
+  RETENTION_OUTPUT=$(timeout 20 gsutil retention get gs://$BUCKET_NAME 2>/dev/null) || {
+    echo "ERROR: gsutil command timed out after 20 seconds or access denied for bucket: $BUCKET_NAME"
+    NON_COMPLIANT_FOUND=1
+    continue
+  }
 
   if [ -z "$RETENTION_OUTPUT" ]; then
     echo "Could not retrieve retention policy or bucket does not exist or access is denied."
