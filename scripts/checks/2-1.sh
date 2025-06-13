@@ -8,8 +8,11 @@ fi
 
 PROJECT_ID="$1"
 
-# Fetch IAM policy as JSON
-POLICY_JSON=$(gcloud projects get-iam-policy "$PROJECT_ID" --format=json)
+# Fetch IAM policy as JSON with timeout
+POLICY_JSON=$(timeout 20 gcloud projects get-iam-policy "$PROJECT_ID" --format=json) || {
+  echo "ERROR: gcloud command timed out or failed while retrieving IAM policy."
+  exit 3
+}
 
 # Extract auditConfigs
 AUDIT_CONFIGS=$(echo "$POLICY_JSON" | jq '.auditConfigs // empty')

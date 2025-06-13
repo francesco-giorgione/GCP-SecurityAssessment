@@ -8,13 +8,19 @@ fi
 
 PROJECT_ID="$1"
 
-# Set active project
-gcloud config set project "$PROJECT_ID" --quiet
+# Set active project with timeout
+timeout 20 gcloud config set project "$PROJECT_ID" --quiet || {
+  echo "ERROR: gcloud command timed out or failed while setting project."
+  exit 3
+}
 
 echo "Checking for non-GKE instances with public IPs in project '$PROJECT_ID'..."
 
-# Get instance list as JSON
-JSON_OUTPUT=$(gcloud compute instances list --project="$PROJECT_ID" --format=json)
+# Get instance list as JSON with timeout
+JSON_OUTPUT=$(timeout 20 gcloud compute instances list --project="$PROJECT_ID" --format=json) || {
+  echo "ERROR: gcloud command timed out or failed while listing instances."
+  exit 3
+}
 
 # Find VMs that:
 # 1. Have accessConfigs (i.e., public IP)

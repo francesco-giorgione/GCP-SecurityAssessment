@@ -9,13 +9,19 @@ fi
 PROJECT_ID="$1"
 NON_COMPLIANT_FOUND=0  # Flag per tenere traccia di non-compliance
 
-# Set the active project
-gcloud config set project "$PROJECT_ID" >/dev/null
+# Set the active project (anche se non strettamente necessario per gcloud sql commands)
+timeout 20 gcloud config set project "$PROJECT_ID" --quiet >/dev/null || {
+  echo "ERROR: gcloud command timed out or failed while setting project."
+  exit 3
+}
 
-# Retrieve list of MySQL instances
-INSTANCES=$(gcloud sql instances list \
+# Retrieve list of MySQL instances with timeout
+INSTANCES=$(timeout 20 gcloud sql instances list \
   --filter='DATABASE_VERSION:MYSQL*' \
-  --format='value(NAME)')
+  --format='value(NAME)') || {
+    echo "ERROR: gcloud command timed out or failed while listing SQL instances."
+    exit 3
+}
 
 if [ -z "$INSTANCES" ]; then
   echo "No MySQL instances found in project $PROJECT_ID"
@@ -25,7 +31,10 @@ fi
 for INSTANCE in $INSTANCES; do
   echo "Checking instance: $INSTANCE"
 
-  JSON_OUTPUT=$(gcloud sql instances describe "$INSTANCE" --format=json)
+  JSON_OUTPUT=$(timeout 20 gcloud sql instances describe "$INSTANCE" --format=json) || {
+    echo "ERROR: gcloud command timed out or failed while describing instance $INSTANCE."
+    exit 3
+  }
 
   # Check if databaseFlags field exists
   HAS_FLAGS=$(echo "$JSON_OUTPUT" | jq '.settings.databaseFlags != null')

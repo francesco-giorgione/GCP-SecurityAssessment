@@ -8,12 +8,18 @@ fi
 
 PROJECT_ID="$1"
 
-# Set project
-gcloud config set project "$PROJECT_ID" --quiet
+# Set project with timeout
+timeout 20 gcloud config set project "$PROJECT_ID" --quiet || {
+  echo "ERROR: gcloud command timed out or failed while setting project."
+  exit 3
+}
 
-# List instances with their IP forwarding setting
+# List instances with their IP forwarding setting with timeout
 echo "Checking instances for IP forwarding..."
-OUTPUT=$(gcloud compute instances list --format='table(name,canIpForward)' --project="$PROJECT_ID")
+OUTPUT=$(timeout 20 gcloud compute instances list --format='table(name,canIpForward)' --project="$PROJECT_ID") || {
+  echo "ERROR: gcloud command timed out or failed while listing instances."
+  exit 3
+}
 
 # Filter only instances with canIpForward = true
 FORWARDING_INSTANCES=$(echo "$OUTPUT" | grep -i -w "true")
