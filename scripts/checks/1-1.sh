@@ -49,7 +49,7 @@ while read -r MEMBER; do
 
   case "$TYPE" in
     user)
-      if [[ "$IDENTIFIER" != *"@$AUTHORIZED_DOMAIN" ]]; then
+      if [[ ! "$IDENTIFIER" =~ @([a-zA-Z0-9.-]+\.)?$AUTHORIZED_DOMAIN$ ]]; then
         echo "NON-COMPLIANT: External user detected: $IDENTIFIER"
         NON_COMPLIANT_FOUND=1
       fi
