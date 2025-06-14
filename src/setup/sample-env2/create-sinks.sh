@@ -23,7 +23,7 @@ SINK1_NAME="error-sink-bucket1"
 SINK2_NAME="error-sink-bucket2"
 LOG_FILTER='severity=ERROR'
 
-# Create sink 1 - with retention
+# Create sink 1 - with locked retention
 echo "Creating sink '$SINK1_NAME' for bucket: $BUCKET1"
 gcloud logging sinks create "$SINK1_NAME" \
   "storage.googleapis.com/$BUCKET1" \
@@ -31,7 +31,7 @@ gcloud logging sinks create "$SINK1_NAME" \
   --project="$PROJECT_ID" \
   --quiet
 
-# Create sink 2 - with retention
+# Create sink 2 - with locked retention
 echo "Creating sink '$SINK2_NAME' for bucket: $BUCKET2"
 gcloud logging sinks create "$SINK2_NAME" \
   "storage.googleapis.com/$BUCKET2" \
@@ -46,5 +46,7 @@ echo "Setting permanent retention on bucket: $BUCKET2"
 gsutil retention set 36500d gs://$BUCKET2
 
 # (Optional) Lock the retention policy to make it permanent
+echo "Locking retention policy on bucket: $BUCKET1 (cannot be undone)"
+gsutil retention lock gs://$BUCKET1
 echo "Locking retention policy on bucket: $BUCKET2 (cannot be undone)"
 gsutil retention lock gs://$BUCKET2
