@@ -43,14 +43,23 @@ for DEST in $BUCKET_URLS; do
 
   if [ -z "$RETENTION_OUTPUT" ]; then
     echo "Could not retrieve retention policy or bucket does not exist or access is denied."
+    NON_COMPLIANT_FOUND=1
   else
     echo "Retention policy:"
     echo "$RETENTION_OUTPUT"
 
+    # Check if duration is set
     if echo "$RETENTION_OUTPUT" | grep -q "Duration"; then
-      echo "Retention policy is set."
+      # Check if policy is LOCKED or UNLOCKED using first line
+      FIRST_LINE=$(echo "$RETENTION_OUTPUT" | head -n 1)
+      if echo "$FIRST_LINE" | grep -q "(LOCKED)"; then
+        echo "Retention policy is set and locked — COMPLIANT"
+      else
+        echo "NON-COMPLIANT: retention policy is not locked"
+        NON_COMPLIANT_FOUND=1
+      fi
     else
-      echo "NON-COMPLIANT: no retention policy is set. Manual review recommended!"
+      echo "NON-COMPLIANT: no retention policy is set"
       NON_COMPLIANT_FOUND=1
     fi
   fi
