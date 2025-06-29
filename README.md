@@ -59,7 +59,7 @@ gcloud config unset project
 **2.** Autenticarsi con un account che ha il permesso di accedere al progetto su cui si intende
 utilizzare il framework.
 
-`gcloud auth login`
+`gcloud auth application-default login`
 
 
 **3.** Impostare il progetto su cui eseguire i controlli e di cui consumare le quote
@@ -67,7 +67,7 @@ al momento dell'invocazione delle API.
 
 ```
 gcloud config set project <PROJECT-ID>
-gcloud auth application-default set-quota-project <PROJECT-ID>
+gcloud auth set-quota-project <PROJECT-ID>
 ```
 
 
