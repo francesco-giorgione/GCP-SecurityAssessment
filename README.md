@@ -3,14 +3,9 @@ More actions
 
 
 
-Il progetto implementa un framework, basato su script bash, per il Secu
-
-rity Assessment delle impostazioni di configurazione di un progetto Google Cloud Platform
-
+Il progetto implementa un framework, basato su script bash, per il Security Assessment delle impostazioni di configurazione di un progetto Google Cloud Platform
 (GCP). Il meccanismo di audit è stato implementato tenendo conto di un sottoinsieme delle
-
 raccomandazioni contenute nel CIS Benchmarks per GCP. Si intende, con la presente repo, fornire una Proof of Concept
-
 che funga da punto di partenza per lo sviluppo di strumenti da usare in produzione.
 
 
@@ -25,19 +20,11 @@ Di seguito è riportata una breve descrizione del contenuto delle diverse path d
 
 `/src/checks`: contiene gli script per l'esecuzione dei controlli
 
-
-
 `/src/setup/sample-env1` contiene gli script utilizzati per la creazione e la configurazione
-
 del Progetto 1 (maggiori dettagli nella documentazione)
 
-
-
 `/src/setup/sample-env2` contiene gli script utilizzati per la creazione e la configurazione
-
 del Progetto 2 (maggiori dettagli nella documentazione)
-
-
 
 `GCP_SA_report.pdf`: è la documentazione del progetto.
 
@@ -67,7 +54,7 @@ al momento dell'invocazione delle API.
 
 ```
 gcloud config set project <PROJECT-ID>
-gcloud auth set-quota-project <PROJECT-ID>
+gcloud auth application-default set-quota-project <PROJECT-ID>
 ```
 
 
@@ -80,6 +67,6 @@ di utenti appartenenti a un dominio diverso da quello specificato
 
 ## Autori e contatti
 
-| Autore              | Indirizzo email                |
-
-|---------------------|--------------------------------|
+| Autore              | Indirizzo email                 |
+|---------------------|---------------------------------|
+| Francesco Giorgione | francesco.giorgione01@gmail.com |
