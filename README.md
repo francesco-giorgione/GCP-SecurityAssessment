@@ -50,66 +50,32 @@ del Progetto 2 (maggiori dettagli nella documentazione)
 Dopo aver installato Google Cloud CLI. eseguire le operazioni seguenti:
 
 
-
-
-
-
-
 **1.** Rimuovere eventuali account e/o progetti GCP precedentemente impostati.
-
-
-
 ```
-
 gcloud config unset account
-
 gcloud config unset project
-
 ```
-
-
 
 **2.** Autenticarsi con un account che ha il permesso di accedere al progetto su cui si intende
-
 utilizzare il framework.
-
-
-
 
 `gcloud auth login`
 
 
-
-
-
 **3.** Impostare il progetto su cui eseguire i controlli e di cui consumare le quote
-
 al momento dell'invocazione delle API.
 
-
-
 ```
-
 gcloud config set project <PROJECT-ID>
-
 gcloud auth application-default set-quota-project <PROJECT-ID>
-
 ```
-
 
 
 **4.** Utilizzare gli script di verifica in `/src/checks`. Lo script `/src/checks/check-all.sh`
-
 richiede di specificare su linea di comando
-
 l’ID del progetto GCP da analizzare e il dominio autorizzato; quest’ultima informazione è
-
 necessaria per eseguire il controllo **3.2** del **GCP CIS Benchmarks**, riferito all’eventuale presenza, all’interno del progetto,
-
 di utenti appartenenti a un dominio diverso da quello specificato
-
-
-
 
 
 ## Autori e contatti
