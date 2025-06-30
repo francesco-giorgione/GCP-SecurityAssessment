@@ -1,7 +1,4 @@
 # Framework per il Security Assessment di un’Infrastruttura Google Cloud Platform (GCP)
-More actions
-
-
 
 Il progetto implementa un framework, basato su script bash, per il Security Assessment delle impostazioni di configurazione di un progetto Google Cloud Platform
 (GCP). Il meccanismo di audit è stato implementato tenendo conto di un sottoinsieme delle
